@@ -1,4 +1,8 @@
 # karlo-rs
+
+```bash
+cargo install karlo-rs
+```
   
 [Karlo](https://developers.kakao.com/docs/latest/ko/karlo/common)는 카카오에서 만든 사용자가 입력한 문장과 이미지를 기반으로 새로운 이미지를 만드는 기능입니다.
 
