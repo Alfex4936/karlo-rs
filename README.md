@@ -1,4 +1,4 @@
-# karlo-rs
+# [karlo-rs](https://crates.io/crates/karlo-rs)
 
 ```bash
 cargo install karlo-rs
