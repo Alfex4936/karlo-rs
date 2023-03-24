@@ -7,7 +7,17 @@ use reqwest;
 use serde_json::{json, Value};
 use std::io::Cursor;
 
-// 이미지 생성하기 요청
+/// Sends a request to generate an image based on the given text using the Kakao Brain API.
+///
+/// # Arguments
+///
+/// * `text` - a string slice containing the prompt to generate the image from
+/// * `batch_size` - a usize specifying the number of images to generate per request (1 to 8)
+/// * `api_key` - a string slice containing the API key to use for the generation request
+///
+/// # Returns
+///
+/// This function returns a `Result` with the API response as a `Value` on success, or a `reqwest::Error` on failure.
 async fn t2i(text: &str, batch_size: usize, api_key: &str) -> Result<Value, reqwest::Error> {
     let client = reqwest::Client::new();
     let res = client
@@ -28,7 +38,15 @@ async fn t2i(text: &str, batch_size: usize, api_key: &str) -> Result<Value, reqw
     Ok(response)
 }
 
-// Base64 디코딩 및 변환
+/// Decodes a base64-encoded string into an RgbaImage.
+///
+/// # Arguments
+///
+/// * `base64_string` - a string slice containing the base64-encoded image data
+///
+/// # Returns
+///
+/// This function returns an `RgbaImage`.
 pub fn string_to_image(base64_string: &str) -> RgbaImage {
     let img_data = general_purpose::STANDARD.decode(base64_string).unwrap();
     let img = ImageReader::new(Cursor::new(img_data))
@@ -91,7 +109,17 @@ pub async fn generate_image(
 
 /** GENERATE VARIATIONS **/
 
-// 이미지 변환하기
+/// Sends a request to generate variations of an input image using the Kakao Brain API.
+///
+/// # Arguments
+///
+/// * `image_base64` - a string slice containing the base64-encoded image data
+/// * `batch_size` - a usize specifying the number of variations to generate per request (1 to 8)
+/// * `api_key` - a string slice containing the API key to use for the generation request
+///
+/// # Returns
+///
+/// This function returns a `Result` with the API response as a `Value` on success, or a `reqwest::Error` on failure.
 async fn variations(
     image_base64: &str,
     batch_size: usize,
@@ -116,7 +144,15 @@ async fn variations(
     Ok(response)
 }
 
-// Base64 인코딩
+/// Encodes an image as a base64-encoded string.
+///
+/// # Arguments
+///
+/// * `img` - a reference to a `DynamicImage`
+///
+/// # Returns
+///
+/// String of base64-encoded string
 fn image_to_base64_string(img: &DynamicImage) -> String {
     let mut buffer = Vec::new();
     let mut cursor = Cursor::new(&mut buffer);
