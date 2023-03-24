@@ -1,6 +1,6 @@
 [package]
 name = "karlo-rs"
-version = "1.0.0"
+version = "1.0.1"
 edition = "2021"
 description = "Kakao's Karlo API Rust wrapper"
 authors = ["Seok Won <ikr@kakao.com>"]
