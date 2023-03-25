@@ -1,4 +1,4 @@
-# [karlo-rs](https://crates.io/crates/karlo-rs)
+# [karlo-py](https://pypi.org/project/karlo-py/)
 
 ```bash
 pip install karlo-py
@@ -38,37 +38,42 @@ B^EDIT에서 Karlo를 사용한 이미지 생성 기능을 간편하게 체험�
 
 # 사용 예시
 
-```rust
-use dotenv::dotenv;
-use karlo_rs;
-use std::env;
-use tokio;
+```py
+import asyncio
+import os
 
-#[tokio::main]
-async fn main() {
-    dotenv().ok();
-    let api_key = env::var("API_KEY").expect("API_KEY not set in .env file");
+from karlo_py import gen_image, gen_variation
 
-    // Generate images based on prompt text
-    let text = "A newyork home, steampunk, snowy";
-    let output_name = "sample_img/output"; // will be png
-    let batch_size = Some(2); // or Some(value) where value is between 1 and 8
 
-    match karlo_rs::generate_image(text, output_name, &api_key, batch_size).await {
-        Ok(_) => println!("Image saved to {}", output_name),
-        Err(e) => eprintln!("Error: {}", e),
-    }
+async def main():
+    API_KEY = os.getenv("API_KEY")
 
-    // Generate images based on input image.
-    let input_path = "sample_img/output_1.png";
-    let output_name = "sample_img/output_variation"; // will be png
-    let batch_size = None; // or Some(value) where value is between 1 and 8
+    if API_KEY is None:
+        raise ValueError("API_KEY not set in environment")
 
-    match karlo_rs::generate_variations(input_path, output_name, &api_key, batch_size).await {
-        Ok(_) => println!("Variation image saved to {}", output_name),
-        Err(e) => eprintln!("Error: {}", e),
-    }
-}
+    text = "A newyork home, steampunk, snowy"
+    output_name = "py_img/output"  # will be png
+    batch_size = 2  # or an integer between 1 and 8
+
+    try:
+        await gen_image(text, output_name, API_KEY, batch_size)
+        print(f"Image saved to {output_name}")
+    except Exception as e:
+        print(e)
+
+    input_path = "py_img/output_1.png"
+    output_name = "py_img/output_variation"  # will be png
+    batch_size = None  # or an integer between 1 and 8
+
+    try:
+        await gen_variation(input_path, output_name, API_KEY, batch_size)
+        print(f"Variation image saved to {output_name}")
+    except Exception as e:
+        print(f"Error: {e}")
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
 ```
 
 ## 위 실행 결과

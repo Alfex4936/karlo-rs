@@ -1,8 +1,11 @@
 # [karlo-rs](https://crates.io/crates/karlo-rs)
 
+## Rust 버전 설치
 ```bash
 cargo install karlo-rs
 ```
+
+## Python 버전 설치
 
 > Python 버전은 pyo3_src 폴더를 확인하세요.
 
