@@ -1,0 +1,17 @@
+[package]
+name = "karlo-py"
+version = "1.0.0"
+edition = "2021"
+description = "Kakao's Karlo API Python wrapper"
+authors = ["Seok Won <ikr@kakao.com>"]
+license = "MIT"
+
+[lib]
+path = "src/lib.rs"
+name = "karlo_py"
+crate-type = ["cdylib"]
+
+[dependencies]
+pyo3 = { version = "0.18", features = ["extension-module"] }
+pyo3-asyncio = { version = "0.18", features = ["attributes", "tokio-runtime"] }
+karlo-rs = { path = "../" }

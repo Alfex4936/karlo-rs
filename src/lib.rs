@@ -1,11 +1,14 @@
-use base64::{
-    engine::{self, general_purpose},
-    Engine as _,
-};
+use base64::{engine::general_purpose, Engine as _};
 use image::{io::Reader as ImageReader, DynamicImage, RgbaImage};
 use reqwest;
 use serde_json::{json, Value};
+use std::fs;
 use std::{borrow::Cow, io::Cursor};
+
+fn ensure_dir_exists(path: &str) -> std::io::Result<()> {
+    let dir_path = std::path::Path::new(path).parent().unwrap();
+    fs::create_dir_all(dir_path)
+}
 
 /// Sends a request to generate an image based on the given text using the Kakao Brain API.
 ///
@@ -99,6 +102,7 @@ pub async fn generate_image(
         let image_base64 = image_data["image"].as_str().unwrap();
         let result = string_to_image(image_base64);
         let output_path = Cow::from(format!("{}_{}.png", output_prefix, index + 1));
+        ensure_dir_exists(&output_path)?;
         result.save(&*output_path)?;
 
         println!("Generated image saved to {}", output_path);
@@ -207,6 +211,7 @@ pub async fn generate_variations(
         let image_base64 = image_data["image"].as_str().unwrap();
         let result = string_to_image(image_base64);
         let output_path = Cow::from(format!("{}_{}.png", output_prefix, index + 1));
+        ensure_dir_exists(&output_path)?;
         result.save(&*output_path)?;
 
         println!("Variation image saved to {}", output_path);

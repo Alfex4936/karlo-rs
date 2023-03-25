@@ -1,12 +1,6 @@
 # [karlo-rs](https://crates.io/crates/karlo-rs)
 
 ```bash
-cargo install karlo-rs
-```
-
-> Python 버전은 pyo3_src 폴더를 확인하세요.
-
-```bash
 pip install karlo-py
 ```
   
