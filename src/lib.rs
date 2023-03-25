@@ -5,7 +5,7 @@ use base64::{
 use image::{io::Reader as ImageReader, DynamicImage, RgbaImage};
 use reqwest;
 use serde_json::{json, Value};
-use std::io::Cursor;
+use std::{borrow::Cow, io::Cursor};
 
 /// Sends a request to generate an image based on the given text using the Kakao Brain API.
 ///
@@ -98,8 +98,8 @@ pub async fn generate_image(
     for (index, image_data) in response["images"].as_array().unwrap().iter().enumerate() {
         let image_base64 = image_data["image"].as_str().unwrap();
         let result = string_to_image(image_base64);
-        let output_path = format!("{}_{}.png", output_prefix, index + 1);
-        result.save(&output_path)?;
+        let output_path = Cow::from(format!("{}_{}.png", output_prefix, index + 1));
+        result.save(&*output_path)?;
 
         println!("Generated image saved to {}", output_path);
     }
@@ -206,8 +206,8 @@ pub async fn generate_variations(
     for (index, image_data) in response["images"].as_array().unwrap().iter().enumerate() {
         let image_base64 = image_data["image"].as_str().unwrap();
         let result = string_to_image(image_base64);
-        let output_path = format!("{}_{}.png", output_prefix, index + 1);
-        result.save(&output_path)?;
+        let output_path = Cow::from(format!("{}_{}.png", output_prefix, index + 1));
+        result.save(&*output_path)?;
 
         println!("Variation image saved to {}", output_path);
     }
@@ -218,11 +218,39 @@ pub async fn generate_variations(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::fs;
+    use tokio;
+
+    const API_KEY: &str = "your_api_key_here";
 
     #[test]
-    fn test_base64_decode() {
-        use std::fs;
+    fn test_string_to_image() {
         let contents = fs::read_to_string("decode_example.txt").expect("Failed to read file");
-        self::string_to_image(contents.as_str());
+        let _ = string_to_image(contents.as_str());
+    }
+
+    #[test]
+    fn test_image_to_base64_string() {
+        let input_image_path = "path/to/image.png";
+        let input_image = image::open(input_image_path).expect("Failed to open image file");
+        let _ = image_to_base64_string(&input_image);
+    }
+
+    #[tokio::test]
+    async fn test_generate_image() {
+        let prompt = "A beautiful sunset over the ocean";
+        let output_prefix = "sunset in the universe";
+
+        let result = generate_image(prompt, output_prefix, API_KEY, None).await;
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_generate_variations() {
+        let input_path = "path/to/input/image.png";
+        let output_prefix = "output";
+
+        let result = generate_variations(input_path, output_prefix, API_KEY, None).await;
+        assert!(result.is_ok());
     }
 }

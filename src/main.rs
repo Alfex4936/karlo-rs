@@ -9,7 +9,7 @@ async fn main() {
     let api_key = env::var("API_KEY").expect("API_KEY not set in .env file");
 
     // Generate images based on prompt text
-    let text = "A newyork home, steampunk, snowy";
+    let text = "A sunset in the universe";
     let output_name = "sample_img/output"; // will be png
     let batch_size = Some(2); // or Some(value) where value is between 1 and 8
 
