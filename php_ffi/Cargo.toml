@@ -1,0 +1,15 @@
+[package]
+name = "karlo-php"
+version = "1.0.0"
+edition = "2021"
+description = "Kakao's Karlo API php wrapper"
+authors = ["Seok Won <ikr@kakao.com>"]
+license = "MIT"
+
+[lib]
+path = "src/lib.rs"
+name = "karlo_php"
+crate-type = ["cdylib"]
+
+[dependencies]
+karlo-rs = { path = "../" }

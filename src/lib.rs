@@ -41,6 +41,24 @@ async fn t2i(text: &str, batch_size: usize, api_key: &str) -> Result<Value, reqw
     Ok(response)
 }
 
+fn t2i_sync(text: &str, batch_size: usize, api_key: &str) -> Result<Value, reqwest::Error> {
+    let client = reqwest::blocking::Client::new();
+    let res = client
+        .post("https://api.kakaobrain.com/v1/inference/karlo/t2i")
+        .header("Authorization", format!("KakaoAK {}", api_key))
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "prompt": {
+                "text": text,
+                "batch_size": batch_size
+            }
+        }))
+        .send()?;
+
+    println!("Generating image based on text...");
+    res.json()
+}
+
 /// Decodes a base64-encoded string into an RgbaImage.
 ///
 /// # Arguments
@@ -111,6 +129,29 @@ pub async fn generate_image(
     Ok(())
 }
 
+pub fn generate_image_sync(
+    prompt: &str,
+    output_prefix: &str,
+    api_key: &str,
+    batch_size: Option<usize>,
+) -> Result<(), Box<dyn std::error::Error>> {
+    let batch_size = batch_size.unwrap_or(1);
+
+    let response = t2i_sync(prompt, batch_size, api_key)?;
+
+    for (index, image_data) in response["images"].as_array().unwrap().iter().enumerate() {
+        let image_base64 = image_data["image"].as_str().unwrap();
+        let result = string_to_image(image_base64);
+        let output_path = Cow::from(format!("{}_{}.png", output_prefix, index + 1));
+        ensure_dir_exists(&output_path)?;
+        result.save(&*output_path)?;
+
+        println!("Generated image saved to {}", output_path);
+    }
+
+    Ok(())
+}
+
 /** GENERATE VARIATIONS **/
 
 /// Sends a request to generate variations of an input image using the Kakao Brain API.
@@ -146,6 +187,30 @@ async fn variations(
     println!("Generating variations...");
     let response: Value = res.json().await?;
     Ok(response)
+}
+
+fn variations_sync(
+    image_base64: &str,
+    batch_size: usize,
+    api_key: &str,
+) -> Result<Value, reqwest::Error> {
+    let client = reqwest::blocking::Client::new();
+    let res = client
+        .post("https://api.kakaobrain.com/v1/inference/karlo/variations")
+        .header("Authorization", format!("KakaoAK {}", api_key))
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "prompt": {
+                "image": image_base64,
+                "batch_size": batch_size
+            }
+        }))
+        .send()?;
+
+    println!("Generating variations...");
+    // let response: Value = res.json()?;
+    // Ok(response)
+    res.json()
 }
 
 /// Encodes an image as a base64-encoded string.
@@ -206,6 +271,32 @@ pub async fn generate_variations(
     let img_base64 = image_to_base64_string(&input_image);
 
     let response = variations(&img_base64, batch_size, api_key).await?;
+
+    for (index, image_data) in response["images"].as_array().unwrap().iter().enumerate() {
+        let image_base64 = image_data["image"].as_str().unwrap();
+        let result = string_to_image(image_base64);
+        let output_path = Cow::from(format!("{}_{}.png", output_prefix, index + 1));
+        ensure_dir_exists(&output_path)?;
+        result.save(&*output_path)?;
+
+        println!("Variation image saved to {}", output_path);
+    }
+
+    Ok(())
+}
+
+pub fn generate_variations_sync(
+    input_path: &str,
+    output_prefix: &str,
+    api_key: &str,
+    batch_size: Option<usize>,
+) -> Result<(), Box<dyn std::error::Error>> {
+    let batch_size = batch_size.unwrap_or(1);
+
+    let input_image = image::open(input_path)?;
+    let img_base64 = image_to_base64_string(&input_image);
+
+    let response = variations_sync(&img_base64, batch_size, api_key)?;
 
     for (index, image_data) in response["images"].as_array().unwrap().iter().enumerate() {
         let image_base64 = image_data["image"].as_str().unwrap();

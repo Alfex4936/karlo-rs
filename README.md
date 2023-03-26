@@ -12,6 +12,16 @@ cargo install karlo-rs
 ```bash
 pip install karlo-py
 ```
+
+## PHP version
+
+> Check `php_ffi` folder
+
+```bash
+cargo build --release
+cp target/release/libkarlo_php.so
+php main.php
+```
   
 [Karlo](https://developers.kakao.com/docs/latest/ko/karlo/common)는 카카오에서 만든 사용자가 입력한 문장과 이미지를 기반으로 새로운 이미지를 만드는 기능입니다.
 
@@ -46,6 +56,8 @@ B^EDIT에서 Karlo를 사용한 이미지 생성 기능을 간편하게 체험�
 제시어로 계절과 같은 시기적 특징을 반영하도록 하거나, 특정 작가의 스타일을 사용하도록 지정할 수도 있습니다.
 
 # 사용 예시
+
+Add `_sync` to function names if you want synchronous version.
 
 ```rust
 use dotenv::dotenv;
